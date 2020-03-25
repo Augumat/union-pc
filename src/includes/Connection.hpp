@@ -1,0 +1,32 @@
+#pragma once
+#include <string>
+#include <functional>
+#include <pthread.h>
+#include <sys/socket.h> 
+#include <cstring>
+
+class Connection {
+public:
+    /* opens a connection with the specified address via the specified port */
+    static Connection connect(const std::string &address, int port);
+
+    /* sends a message through the current connection */
+    void sendMessage(const std::string &message);
+    /* sets a message handler for when a message is recieved */
+    void onMessage(std::function<void(const std::string&)> handler);
+
+    Connection(int fd);
+    void start();
+    int getId();
+
+private:
+    void run();
+    static void *threadRun(void *ptr);
+
+    std::string readLen(size_t len);
+    void sendData(const std::string &message);
+
+    int fd;
+    pthread_t tid;
+    std::function<void(const std::string&)> msgHandler;
+};

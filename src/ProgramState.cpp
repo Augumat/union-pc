@@ -13,12 +13,12 @@ ProgramState::ProgramState(const std::string &address, int port)
 
 void ProgramState::submit()
 {
-    std::unique_lock l(localUpdatesM);
+    Lock l(localUpdatesM);
     for (auto &item : localUpdates) {
         std::stringstream ss;
         Writer w(ss);
         {
-            std::shared_lock l(ptrIdMtx);
+            SharedLock l(ptrIdMtx);
             auto identifierIt = ptrToId.find(item.first);
             if (identifierIt == ptrToId.end()) {
                 throw std::runtime_error("Untracked item updated");
@@ -45,7 +45,7 @@ void ProgramState::handleMessage(const std::string &msg)
     Reader r(ss);
     std::string identifier, data;
     r >> identifier >> data;
-    std::shared_lock l(ptrIdMtx);
+    SharedLock l(ptrIdMtx);
     auto it = idToPtr.find(identifier);
     if (it != idToPtr.end()) {
         Lock l(remoteUpdatesM);

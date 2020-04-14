@@ -14,6 +14,8 @@ class ProgramState
 {
    public:
     using Lock = std::lock_guard<std::mutex>;
+    using SharedLock = std::shared_lock<std::shared_timed_mutex>;
+    using UniqueLock = std::unique_lock<std::shared_timed_mutex>;
     ProgramState(const std::string &address, int port);
 
     template <typename T>
@@ -38,7 +40,7 @@ class ProgramState
     std::unordered_map<std::string, const void *> idToPtr;
     std::unordered_map<const void *, std::string> localUpdates, remoteUpdates;
 
-    mutable std::shared_mutex ptrIdMtx;
+    mutable std::shared_timed_mutex ptrIdMtx;
     std::mutex localUpdatesM, remoteUpdatesM;
     Connection conn;
 };

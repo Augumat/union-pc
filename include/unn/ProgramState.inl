@@ -7,7 +7,7 @@ namespace unn
 template <typename T>
 void ProgramState::track(T &data, const std::string &identifier)
 {
-    std::unique_lock l(ptrIdMtx);
+    UniqueLock l(ptrIdMtx);
     ptrToId.emplace(&data, identifier);
     idToPtr.emplace(identifier, &data);
 }
@@ -16,7 +16,7 @@ template <typename T>
 ProgramState &operator<<(ProgramState &state, const T &t)
 {
     {
-        std::shared_lock l(state.ptrIdMtx);
+        ProgramState::SharedLock l(state.ptrIdMtx);
         if (state.ptrToId.find(&t) == state.ptrToId.end()) {
             throw std::runtime_error("Attempting to write untracked data");
         }
@@ -46,7 +46,7 @@ ProgramState &operator>>(ProgramState &state, T &t)
 template <typename T>
 void ProgramState::untrack(T &data)
 {
-    std::unique_lock l(ptrIdMtx);
+    UniqueLock l(ptrIdMtx);
     auto it = ptrToId.find(&data);
     if (it != ptrToId.end()) {
         idToPtr.erase(idToPtr.find(it->second));

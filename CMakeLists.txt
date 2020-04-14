@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(union-pc)
 
-add_compile_options(-std=c++17)
+add_compile_options(-std=c++14)
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Threads)

@@ -20,6 +20,7 @@ class Connection
     void onMessage(std::function<void(const std::string &)> handler);
 
     Connection(int fd);
+    Connection(Connection &&other);
     Connection(const Connection &other) = delete;
     void start();
     int getId();

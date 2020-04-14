@@ -78,6 +78,11 @@ void Connection::onMessage(std::function<void(const std::string &)> newHandler)
 }
 
 Connection::Connection(int fd) : fd(fd), tid(0), msgHandler() {}
+Connection::Connection(Connection &&other) : fd(other.fd), tid(other.tid), msgHandler(other.msgHandler) {
+    if (tid != 0) {
+        throw std::runtime_error("Attempting to move connection after calling .start()");
+    }
+}
 
 int Connection::getId() { return fd; }
 

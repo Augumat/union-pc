@@ -7,7 +7,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Threads)
 
-include_directories(src/includes libs)
+include_directories(include/ libs/)
 
 add_executable(
     union-pc

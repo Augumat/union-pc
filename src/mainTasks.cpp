@@ -4,9 +4,9 @@
 #include <string>
 
 #include "CLI11.hpp"
-#include "Connection.hpp"
-#include "ProgramState.hpp"
-#include "Server.hpp"
+#include "unn/Connection.hpp"
+#include "unn/ProgramState.hpp"
+#include "unn/Server.hpp"
 
 using std::cout;
 using std::endl;

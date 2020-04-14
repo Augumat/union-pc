@@ -5,8 +5,8 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "Connection.hpp"
-#include "serialization.hpp"
+#include "unn/Connection.hpp"
+#include "unn/serialization.hpp"
 
 namespace unn
 {
@@ -45,4 +45,4 @@ class ProgramState
 
 }  // namespace unn
 
-#include "ProgramState.inl"
+#include "unn/ProgramState.inl"

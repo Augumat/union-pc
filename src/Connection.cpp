@@ -1,4 +1,4 @@
-#include "Connection.hpp"
+#include "unn/Connection.hpp"
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -77,7 +77,7 @@ void Connection::onMessage(std::function<void(const std::string &)> newHandler)
     msgHandler = newHandler;
 }
 
-Connection::Connection(int fd) : fd(fd) {}
+Connection::Connection(int fd) : fd(fd), tid(0), msgHandler() {}
 
 int Connection::getId() { return fd; }
 

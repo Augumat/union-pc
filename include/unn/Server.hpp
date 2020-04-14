@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "Connection.hpp"
+#include "unn/Connection.hpp"
 
 namespace unn
 {

@@ -2,17 +2,21 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(union-pc)
 
-set_property(GLOBAL PROPERTY CXX_STANDARD 11)
+add_compile_options(-std=c++17)
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Threads)
 
-include_directories(src/includes)
+include_directories(src/includes libs)
 
 add_executable(
     union-pc
     src/main.cpp
     src/Connection.cpp
     src/Server.cpp
+    src/ProgramState.cpp
+    src/serialization.cpp
+    src/mainTasks.cpp
 )
 
 target_link_libraries(union-pc ${CMAKE_THREAD_LIBS_INIT})

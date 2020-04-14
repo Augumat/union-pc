@@ -1,13 +1,11 @@
 #include "Server.hpp"
 
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/socket.h>
-#include <stdlib.h>
 #include <netinet/in.h>
-#include <string.h>
-#include <iostream>
+#include <sys/socket.h>
+#include <unistd.h>
 
+namespace unn
+{
 Server::Server(int port) : fd(socket(AF_INET, SOCK_STREAM, 0))
 {
     int opt = 1;
@@ -23,14 +21,17 @@ Server::Server(int port) : fd(socket(AF_INET, SOCK_STREAM, 0))
 void Server::run()
 {
     while (true) {
-        struct sockaddr_in clientAddr;
-        socklen_t len;
-        std::cout << "Waiting for connection..." << std::endl;
-        int clientSock = accept(fd, (struct sockaddr *)&clientAddr, (socklen_t *)&len);
-        std::cout << "Got connection: " << clientSock << std::endl;
-        connections.emplace_back(clientSock);
-        Connection *conn = &connections.back();
-        conn->onMessage([&](const std::string &message) {
+        struct sockaddr_in clientAddr = {0, 0};
+        socklen_t len = 0;
+        int clientSock =
+            accept(fd, (struct sockaddr *)&clientAddr, (socklen_t *)&len);
+        std::lock_guard<std::mutex> l(connectionsM);
+        connections.emplace_back(std::make_unique<Connection>(clientSock));
+        Connection *conn = &*connections.back();
+        for (auto &i : connectedHandlers) {
+            i(*conn);
+        }
+        conn->onMessage([=](const std::string &message) {
             for (auto &handler : handlers) {
                 handler(message, *conn);
             }
@@ -39,14 +40,18 @@ void Server::run()
     }
 }
 
-void Server::broadcastMessage(const std::string &message)
+void Server::broadcastMessage(const std::string &message, Connection *ignore)
 {
+    std::unique_lock<std::mutex> l(connectionsM);
     for (auto &connection : connections) {
-        connection.sendMessage(message);
+        if (&*connection != ignore) {
+            connection->sendMessage(message);
+        }
     }
 }
 
-void Server::onMessage(const std::function<void(const std::string &, Connection &)> &handler)
+void Server::onMessage(
+    const std::function<void(const std::string &, Connection &)> &handler)
 {
     handlers.emplace_back(handler);
 }
@@ -55,3 +60,5 @@ void Server::onClientConnected(const std::function<void(Connection &)> &handler)
 {
     connectedHandlers.emplace_back(handler);
 }
+
+}  // namespace unn
